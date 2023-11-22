@@ -1,7 +1,10 @@
 package com.example.model.dto;
 
+import java.util.UUID;
+
 public class ProductRequestDTO {
 
+    private UUID hash;
     private String name;
     private String description;
     private String ean13;
@@ -16,8 +19,9 @@ public class ProductRequestDTO {
     }
 
     // Construtor com parâmetros
-    public ProductRequestDTO(String name, String description, String ean13, boolean active,
+    public ProductRequestDTO(UUID hash,String name, String description, String ean13, boolean active,
                              int minStock, double price, int quantity) {
+        this.hash = hash;
         this.name = name;
         this.description = description;
         this.ean13 = ean13;
@@ -28,6 +32,14 @@ public class ProductRequestDTO {
     }
 
     // Getters e Setters
+
+    public UUID getHash() {
+        return hash;
+    }
+
+    public void setHash(UUID hash) {
+        this.hash = hash;
+    }
 
     public String getName() {
         return name;
