@@ -90,6 +90,7 @@
                     <input type="submit" value="Save">
                 </div>
             </form>
+            <button onclick="refreshPage()">Refresh</button>
         </td>
     </tr>
 
@@ -122,7 +123,7 @@
         <tr style="display: none;" id="edit-form-row-${product.id}">
             <td colspan="9">
                 <!-- Formulário de Edição -->
-                <form id="edit-form-${product.id}" class="edit-form" action="<c:url value='/products/update/${product.hash}'/>" method="post">
+                <form id="edit-form-${product.hash}" class="edit-form" action="<c:url value='/products/update/${product.hash}'/>" method="post">
                     <input type="text" name="name" value="${product.name}">
                     <input type="text" name="description" value="${product.description}">
                     <input type="text" name="ean13" value="${product.ean13}">
@@ -155,13 +156,12 @@
         var confirmDelete = confirm("Tem certeza de que deseja excluir este produto?");
 
         if (confirmDelete) {
-            // Passa uma função de callback para manipular a tabela após a exclusão
-            deleteProduct(productHash, function() {
-                // Remove a linha correspondente ao produto excluído
-                $('tr[data-id="' + productHash + '"]').remove();
-            });
+            // Passa o hash como parâmetro para a função deleteProduct
+            deleteProduct(productHash);
+            refreshPage();
         }
     }
+
 
 
     function deleteProduct(productHash) {
@@ -170,14 +170,15 @@
         axios.delete(deleteUrl)
             .then(function (response) {
                 console.log('Exclusão bem-sucedida. ProdutoHash:', productHash);
-                // Redireciona para a mesma página após a exclusão bem-sucedida
-                window.location.href = window.location.href;
             })
             .catch(function (error) {
                 console.error('Erro ao excluir o produto:', error);
             });
     }
 
+    function refreshPage() {
+        location.reload();
+    }
 
 
 </script>
