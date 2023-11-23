@@ -1,5 +1,7 @@
 package com.example.model.dto;
 
+import com.example.model.entity.Product;
+
 import java.util.UUID;
 
 public class ProductRequestDTO {
@@ -16,6 +18,32 @@ public class ProductRequestDTO {
     // Construtor padrão
     public ProductRequestDTO() {
         // Pode adicionar lógica de inicialização aqui, se necessário
+    }
+
+    public Product toEntity() {
+        Product product = new Product();
+        product.setHash(this.getHash());
+        product.setName(this.getName());
+        product.setDescription(this.getDescription());
+        product.setEan13(this.getEan13());
+        product.setPrice(this.getPrice());
+        product.setQuantity(this.getQuantity());
+        product.setMinStock(this.getMinStock());
+        product.setActive(this.isActive());
+        return product;
+    }
+
+    public ProductRequestDTO fromEntity(Product product) {
+        ProductRequestDTO dto = new ProductRequestDTO();
+        dto.setHash(product.getHash());
+        dto.setName(product.getName());
+        dto.setDescription(product.getDescription());
+        dto.setEan13(product.getEan13());
+        dto.setPrice(product.getPrice());
+        dto.setQuantity(product.getQuantity());
+        dto.setMinStock(this.getMinStock());
+        dto.setActive(this.isActive());
+        return dto;
     }
 
     // Construtor com parâmetros
