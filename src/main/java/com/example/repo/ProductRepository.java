@@ -2,7 +2,6 @@ package com.example.repo;
 
 
 import com.example.model.entity.Product;
-import com.example.model.dto.ProductRequestDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

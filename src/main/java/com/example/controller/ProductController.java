@@ -2,20 +2,14 @@
 
     import com.example.model.dto.ProductRequestDTO;
     import com.example.model.entity.Product;
-    import jakarta.validation.Valid;
     import org.springframework.beans.factory.annotation.Autowired;
     import org.springframework.http.ResponseEntity;
     import org.springframework.stereotype.Controller;
     import org.springframework.ui.Model;
-    import org.springframework.validation.BindingResult;
-    import com.example.model.dto.ProductRequestDTO;
-    import com.example.model.entity.Product;
     import com.example.service.ProductService;
     import org.springframework.web.bind.annotation.*;
-    import com.example.service.ProductService;
 
     import java.util.List;
-    import java.util.Objects;
     import java.util.UUID;
 
     @Controller
@@ -29,7 +23,7 @@
         public String home(Model model) {
             List<Product> products = productService.getAllProducts();
             model.addAttribute("products", products);
-            return "home";
+            return "index";
         }
 
         @PostMapping("/update/{productHash}")

@@ -162,8 +162,6 @@
         }
     }
 
-
-
     function deleteProduct(productHash) {
         const deleteUrl = '<c:url value="/products/delete/' + productHash + '"/>';
 
@@ -179,7 +177,6 @@
     function refreshPage() {
         location.reload();
     }
-
 
 </script>
 
