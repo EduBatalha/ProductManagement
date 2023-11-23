@@ -64,11 +64,16 @@ public class ProductService {
         return ResponseEntity.ok("Produto atualizado com sucesso");
     }
 
-    public boolean deleteProduct (UUID hash) {
-        productRep.deleteByHash(hash);
-
-        return productRep.findByHash(hash) != null;
+    public boolean deleteProduct(UUID hash) {
+        try {
+            productRep.deleteByHash(hash);
+            return true; // Produto excluído com sucesso
+        } catch (Exception e) {
+            // Log ou tratamento de exceção, dependendo dos requisitos
+            return false; // Erro ao excluir produto
+        }
     }
+
 
     public void saveProduct(Product product) {
         // Lógica para salvar o produto, por exemplo:

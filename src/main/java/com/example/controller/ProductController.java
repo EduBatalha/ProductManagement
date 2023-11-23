@@ -53,7 +53,12 @@
             }
         }
 
+        @DeleteMapping("/delete/{productHash}")
+        public String deleteProduct(@PathVariable UUID productHash) {
+            boolean deleted = productService.deleteProduct(productHash);
 
+            return "redirect:/products";
+        }
 
 
         @GetMapping("/list")
@@ -68,8 +73,6 @@
             productService.saveProduct(product);
             return "redirect:/products";
         }
-
-
 
         private Product convertToEntity(ProductRequestDTO productRequestDTO) {
             Product product = new Product();

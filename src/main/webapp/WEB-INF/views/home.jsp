@@ -39,6 +39,8 @@
             cursor: pointer;
         }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.4/axios.min.js"></script>
 </head>
 <body>
 
@@ -91,8 +93,6 @@
         </td>
     </tr>
 
-
-
     <tr>
         <th>ID</th>
         <th>Hash</th>
@@ -103,12 +103,7 @@
         <th>Min Stock</th>
         <th>Price</th>
         <th>Quantity</th>
-        <th>Action</th>
     </tr>
-
-
-
-
 
     <c:forEach var="product" items="${products}">
         <tr>
@@ -138,28 +133,53 @@
                     <!-- Adicione outros campos conforme necessário -->
                     <input type="submit" value="Save">
                 </form>
+                <button onclick="confirmAndDelete('${product.hash}')">Delete</button>
             </td>
         </tr>
     </c:forEach>
     </tbody>
 </table>
 
-
 <script>
     function enableEdit(element) {
-        // Esconder todos os formulários de edição
-        var editFormRows = document.querySelectorAll('[id^="edit-form-row-"]');
+        var editFormRows = $('[id^="edit-form-row-"]');
 
-        for (var i = 0; i < editFormRows.length; i++) {
-            editFormRows[i].style.display = 'none';
-        }
+        editFormRows.hide();
 
-        // Mostrar a linha da tabela associada a este elemento
-        var productId = element.getAttribute('data-id');
-        var editFormRow = document.getElementById('edit-form-row-' + productId);
-
-        editFormRow.style.display = 'table-row';
+        var productId = $(element).data('id');
+        var editFormRow = $('#edit-form-row-' + productId);
+        editFormRow.show();
     }
+
+    function confirmAndDelete(productHash) {
+        var confirmDelete = confirm("Tem certeza de que deseja excluir este produto?");
+
+        if (confirmDelete) {
+            // Passa uma função de callback para manipular a tabela após a exclusão
+            deleteProduct(productHash, function() {
+                // Remove a linha correspondente ao produto excluído
+                $('tr[data-id="' + productHash + '"]').remove();
+            });
+        }
+    }
+
+
+    function deleteProduct(productHash) {
+        const deleteUrl = '<c:url value="/products/delete/' + productHash + '"/>';
+
+        axios.delete(deleteUrl)
+            .then(function (response) {
+                console.log('Exclusão bem-sucedida. ProdutoHash:', productHash);
+                // Redireciona para a mesma página após a exclusão bem-sucedida
+                window.location.href = window.location.href;
+            })
+            .catch(function (error) {
+                console.error('Erro ao excluir o produto:', error);
+            });
+    }
+
+
+
 </script>
 
 
