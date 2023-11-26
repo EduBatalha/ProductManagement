@@ -7,6 +7,10 @@ import java.util.Date;
 import java.util.UUID;
 
 @Entity
+@Table(uniqueConstraints = {
+        @UniqueConstraint(columnNames = "name"),
+        @UniqueConstraint(columnNames = "ean13")
+})
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

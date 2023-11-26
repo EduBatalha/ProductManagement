@@ -33,6 +33,53 @@
 
         }
 
+        /* HEADER DA TABELA */
+        .head{
+            display: flex;
+            flex-direction: row;
+            justify-items: center;
+            justify-content: space-between;
+            padding-top: 1em;
+            padding-bottom: 1em;
+            padding-right: 4em;
+            padding-left: 4em;
+        }
+
+        .search{
+            background-color: #FFFFFF;
+            border: 2px solid #422800;
+            text-align: center;
+            border-radius: 15px;
+            box-shadow: #422800 4px 4px 0 0;
+            color: #422800;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1vw;
+            outline: none;
+            margin-left: auto;
+        }
+
+        .menu-icon{
+            margin-left: auto;
+            font-size: 1.5em;
+            color: #422800;
+        }
+
+        .menu{
+            background-color: #F0E8A5;
+            border: 2px solid #422800;
+            text-align: center;
+            border-radius: 15px;
+            box-shadow: #422800 4px 4px 0 0;
+            color: #422800;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1vw;
+            outline: none;
+        }
+
+        /* CAMPOS TABELA */
+
         .form {
             display: flex;
             flex-wrap: nowrap;
@@ -49,7 +96,6 @@
 
         .form-row{
             width: fit-content;
-
         }
 
         .boolean-row{
@@ -114,6 +160,7 @@
             box-shadow: #422800 2px 2px 0 0;
             transform: translate(2px, 2px);
         }
+
         .button-delete{
             margin-top: 2px;
             height: auto;
@@ -137,6 +184,7 @@
             height: 18px;
         }
 
+    /* SLIDER */
         /* Works on Firefox */
         * {
             scrollbar-width: thin;
@@ -158,6 +206,38 @@
             border: 3px solid #F0E8A5;;
         }
 
+    /* MENU */
+        .menu {
+            display: none;
+            position: absolute;
+            background-color: #f1f1f1;
+            box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            z-index: 1;
+        }
+
+        .menu label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .menu-icon {
+            cursor: pointer;
+        }
+
+    /* ERROS */
+        .error-message {
+            display: none;
+            position: absolute;
+            background-color: #ff8080;
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: -30px; /* Ajuste conforme necessário para a posição desejada */
+            margin-left: 10px; /* Ajuste conforme necessário para a posição desejada */
+        }
+
+
     </style>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
@@ -166,10 +246,26 @@
 <body>
 
 <table>
+    <thead>
+    <tr>
+
+        <td colspan="10">
+            <div class="head">
+                <label for="searchInput"></label><input class="search" type="text" id="searchInput" placeholder="Pesquisar">
+
+                <div class="menu-icon" onclick="toggleMenu()">☰</div>
+                <div id="filterMenu" class="menu">
+                    <label><input type="checkbox" id="filterLowStock"> Mostrar produtos com estoque baixo</label>
+                </div>
+            </div>
+        </td>
+    </tr>
+    </thead>
     <tbody>
     <tr class="linha-form">
         <td colspan="10">
             <h2>Create a New Product</h2>
+
             <div class="form-cadastro">
             <form class="form" action="<c:url value='/products/save'/>" method="post" modelAttribute="productRequestDTO">
                 <div class="form-row">
@@ -212,12 +308,17 @@
                 <div class="form-row">
                     <input class="button-save" type="submit" value="Save">
                 </div>
+                <!-- Adicione este bloco onde você deseja exibir mensagens de erro -->
+                <c:if test="${not empty error}">
+                    <div id="error-message" class="error-message">
+                        <span>${error}</span>
+                    </div>
+                </c:if>
             </form>
             <button class="button-refresh" onclick="refreshPage()">↻</button>
             </div>
         </td>
     </tr>
-
     <tr>
         <th>ID</th>
         <th>Hash</th>
@@ -269,6 +370,7 @@
 </table>
 
 <script>
+
     function enableEdit(element) {
         let editFormRows = $('[id^="edit-form-row-"]');
         let productId = $(element).data('id');
@@ -309,6 +411,89 @@
     function refreshPage() {
         location.reload();
     }
+
+    // Função para filtro por estoque baixo
+    function filterLowStock() {
+        var showLowStock = $('#filterLowStock').prop('checked');
+
+        $('.product-row').each(function () {
+            var minStock = parseInt($(this).find('.field[data-field="minStock"]').text());
+            var quantity = parseInt($(this).find('.field[data-field="quantity"]').text());
+
+            if (showLowStock && quantity < minStock) {
+                $(this).show();
+            } else if (!showLowStock) {
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
+        });
+    }
+
+    // Função para pesquisa pela barra de busca
+    function searchTable(query) {
+        query = removeAccents(query.toLowerCase());
+
+        $('.product-row').each(function () {
+            var rowData = removeAccents($(this).text().toLowerCase());
+
+            if (rowData.indexOf(query) > -1) {
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        // Adiciona um evento de escuta à checkbox #filterLowStock
+        $('#filterLowStock').change(function () {
+            filterLowStock(); // Atualiza a tabela ao marcar/desmarcar a checkbox de estoque baixo
+        });
+
+        // Adiciona eventos de escuta à barra de busca
+        $('#searchInput').on('input', function () {
+            searchTable($(this).val()); // Atualiza a tabela ao digitar na barra de busca
+        });
+
+        $('#searchInput').on('keydown', function (e) {
+            if (e.key === 'Enter') {
+                searchTable($(this).val()); // Atualiza a tabela ao pressionar Enter na barra de busca
+            }
+        });
+    });
+
+        function removeAccents(str) {
+        return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
+
+    function toggleMenu() {
+        var menu = document.getElementById('filterMenu');
+
+        // Verifica se o menu está atualmente visível
+        var isVisible = menu.style.display === 'block';
+
+        // Ajusta a posição do menu para a esquerda do ícone (caso o menu esteja escondido)
+        menu.style.right = isVisible ? 'auto' : 'calc(100% - 92%)';
+
+        // Alterna a visibilidade do menu
+        menu.style.display = isVisible ? 'none' : 'block';
+
+    }
+
+    $(document).ready(function() {
+        // Exibe a mensagem de erro se estiver presente
+        showErrorMessage();
+
+        // Função para exibir a mensagem de erro
+        function showErrorMessage() {
+            var errorMessage = $("#error-message span").text();
+            if (errorMessage.trim() !== "") {
+                $("#error-message").fadeIn().delay(3000).fadeOut(); // Exibe por 3 segundos
+            }
+        }
+    });
+
 
 </script>
 

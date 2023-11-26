@@ -2,11 +2,15 @@ package com.example.service;
 
 import com.example.model.dto.ProductRequestDTO;
 import com.example.model.entity.Product;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import com.example.repo.ProductRepository;
 
+import javax.persistence.PersistenceException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -73,11 +77,26 @@ public class ProductService {
 
 
     public void saveProduct(Product product) {
-        // Lógica para salvar o produto, por exemplo:
-        product.setDtCreate(new Date());
-        product.setHash(UUID.randomUUID());
-        product.setDtCreate(new Date());
+        try {
+            product.setDtCreate(new Date());
+            product.setHash(UUID.randomUUID());
 
-        productRep.saveProduct(product);;
+            productRep.saveProduct(product);
+        } catch (DataIntegrityViolationException e) {
+            if (e.getCause() instanceof ConstraintViolationException) {
+                ConstraintViolationException cause = (ConstraintViolationException) e.getCause();
+
+                for (ConstraintViolation<?> violation : cause.getConstraintViolations()) {
+                    if (violation.getPropertyPath().toString().equals("name")) {
+                        throw new ProductValidationException("Já existe um produto com o mesmo nome.");
+                    } else if (violation.getPropertyPath().toString().equals("ean13")) {
+                        throw new ProductValidationException("Já existe um produto com o mesmo EAN-13.");
+                    }
+                }
+            }
+            throw e; // Re-throw the exception if it's not a constraint violation related to name or ean13
+        }
     }
+
 }
+

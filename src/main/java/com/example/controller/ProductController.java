@@ -2,7 +2,11 @@
 
     import com.example.model.dto.ProductRequestDTO;
     import com.example.model.entity.Product;
+    import com.example.service.ProductValidationException;
+    import jakarta.validation.ConstraintViolationException;
     import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.dao.DataIntegrityViolationException;
+    import org.springframework.web.servlet.mvc.support.RedirectAttributes;
     import org.springframework.http.ResponseEntity;
     import org.springframework.stereotype.Controller;
     import org.springframework.ui.Model;
@@ -61,11 +65,31 @@
             return productService.getAllProducts();
         }
 
+
         @PostMapping("/save")
-        public String saveProduct(@ModelAttribute("productRequestDTO") ProductRequestDTO productRequestDTO) {
-            Product product = convertToEntity(productRequestDTO);
-            productService.saveProduct(product);
-            return "redirect:/products";
+        public String saveProduct(@ModelAttribute("productRequestDTO") ProductRequestDTO productRequestDTO, RedirectAttributes redirectAttributes) {
+            try {
+                // Converte o objeto DTO para a entidade correspondente
+                Product product = convertToEntity(productRequestDTO);
+
+                // Chama o serviço para salvar o produto
+                productService.saveProduct(product);
+
+                // Redireciona para a página de produtos após o salvamento bem-sucedido
+                return "redirect:/products";
+            } catch (DataIntegrityViolationException e) {
+                // Manipule a exceção de violação de integridade (por exemplo, duplicidade de valores únicos)
+                redirectAttributes.addFlashAttribute("error", "Erro de integridade ao salvar o produto. <br>O produto não pode ter nome ou EAN repetido/");
+                return "redirect:/products";
+            } catch (ProductValidationException e) {
+                // Captura a exceção específica para validação de produto
+                redirectAttributes.addFlashAttribute("error", e.getMessage());
+                return "redirect:/products";
+            } catch (Exception e) {
+                // Trate outras exceções, se necessário
+                redirectAttributes.addFlashAttribute("error", "Erro ao salvar o produto.");
+                return "redirect:/products";
+            }
         }
 
         private Product convertToEntity(ProductRequestDTO productRequestDTO) {

@@ -30,7 +30,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Modifying
     @Transactional
     @Query("UPDATE Product p SET p.name = :name, p.description = :description, p.ean13 = :ean13, " +
-            "p.active = :active, p.minStock = :minStock, p.price = :price, p.quantity = :quantity " +
+            "p.active = :active, p.minStock = :minStock, p.price = :price, p.quantity = :quantity, p.dtUpdate = CURRENT_TIMESTAMP " +
             "WHERE p.hash = :productHash")
     void updateProduct(@Param("productHash") UUID productHash,
                        @Param("name") String name,
@@ -40,6 +40,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                        @Param("minStock") int minStock,
                        @Param("price") double price,
                        @Param("quantity") int quantity);
+
 
 }
 
